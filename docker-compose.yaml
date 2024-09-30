@@ -1,0 +1,40 @@
+version: "2.29.1-desktop.1"
+
+
+services:
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: legalisperfect010197
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:4.0.2
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  fastapi:
+    build: .
+    restart: always
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      DATABASE_URL: "postgresql+psycopg2://postgres:legalisperfect010197@localhost:5432/shop"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
